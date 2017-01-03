@@ -10,10 +10,8 @@ import android.graphics.ImageFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
-import android.hardware.camera2.CameraCaptureSession.StateListener;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraDevice.StateCallback;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
@@ -65,26 +63,26 @@ public class CameraHelper {
     public  static final int      STATE_CLOSING                    = 3;
     public  static final int      STATE_CLOSED                     = 4;
 
-    private HandlerThread             mCameraStreamHandlerThread = null;
-    private Handler                   mCameraStreamHandler       = null;
-    private Handler                   mUiHandler                 = null;
-    private CameraManager             mCameraManager             = null;
-    private CameraDevice              mCamera                    = null;
-    private CameraCaptureSession      mCameraSession             = null;
-    private CaptureRequest.Builder    mPreviewRequest            = null;
-    private CaptureRequest.Builder    mCaptureRequest            = null;
-    private SurfaceHolder             mPreviewSurfaceHolder      = null;
-    private StateCallback             mCameraStateListener       = null;
-    private CaptureCallback           mCameraCaptureListener     = null;
-    private StateListener             mSessionStateListener      = null;
-    private OnImageAvailableListener  mImageReaderListener       = null;
-    private OnErrorListener           mOnErrorListener           = null;
-    private OnCapturedListener        mOnCapturedListener        = null;
-    private RequestPermissionCallback mRequestPermissionCallback = null;
-    private Size                      mOutputSize                = null;
-    private Size                      mSuggestPreviewSize        = null;
-    private String                    mCameraId                  = null;
-    private int                       mOperationState            = STATE_CLOSED;
+    private HandlerThread                       mCameraStreamHandlerThread = null;
+    private Handler                             mCameraStreamHandler       = null;
+    private Handler                             mUiHandler                 = null;
+    private CameraManager                       mCameraManager             = null;
+    private CameraDevice                        mCamera                    = null;
+    private CameraCaptureSession                mCameraSession             = null;
+    private CaptureRequest.Builder              mPreviewRequest            = null;
+    private CaptureRequest.Builder              mCaptureRequest            = null;
+    private SurfaceHolder                       mPreviewSurfaceHolder      = null;
+    private CameraDevice.StateCallback          mCameraStateListener       = null;
+    private CaptureCallback                     mCameraCaptureListener     = null;
+    private CameraCaptureSession.StateCallback  mSessionStateListener      = null;
+    private OnImageAvailableListener            mImageReaderListener       = null;
+    private OnErrorListener                     mOnErrorListener           = null;
+    private OnCapturedListener                  mOnCapturedListener        = null;
+    private RequestPermissionCallback           mRequestPermissionCallback = null;
+    private Size                                mOutputSize                = null;
+    private Size                                mSuggestPreviewSize        = null;
+    private String                              mCameraId                  = null;
+    private int                                 mOperationState            = STATE_CLOSED;
 
     public interface RequestPermissionCallback {
         boolean onRequestCameraPermission(String[] permission, int requestID);
@@ -132,19 +130,19 @@ public class CameraHelper {
         if (mOnErrorListener != null) {
             final String message;
             switch (error) {
-                case StateCallback.ERROR_CAMERA_IN_USE:
+                case CameraDevice.StateCallback.ERROR_CAMERA_IN_USE:
                     message = "Camera is in use already";
                     break;
-                case StateCallback.ERROR_MAX_CAMERAS_IN_USE:
+                case CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE:
                     message = "Too many camera open";
                     break;
-                case StateCallback.ERROR_CAMERA_DISABLED:
+                case CameraDevice.StateCallback.ERROR_CAMERA_DISABLED:
                     message = "Camera device has been disabled";
                     break;
-                case StateCallback.ERROR_CAMERA_DEVICE:
+                case CameraDevice.StateCallback.ERROR_CAMERA_DEVICE:
                     message = "Camera device has a fatal error";
                     break;
-                case StateCallback.ERROR_CAMERA_SERVICE:
+                case CameraDevice.StateCallback.ERROR_CAMERA_SERVICE:
                     message = "Camera service has a fatal error";
                     break;
 
@@ -247,7 +245,7 @@ public class CameraHelper {
             }
         };
 
-        mSessionStateListener = new CameraCaptureSession.StateListener() {
+        mSessionStateListener = new CameraCaptureSession.StateCallback() {
 
             @Override
             public void onConfigured(CameraCaptureSession session) {
@@ -277,16 +275,6 @@ public class CameraHelper {
             @Override
             public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request, long timestamp, long frameNumber) {
                 super.onCaptureStarted(session, request, timestamp, frameNumber);
-            }
-
-            @Override
-            public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request, long timestamp) {
-                super.onCaptureStarted(session, request, timestamp);
-            }
-
-            @Override
-            public void onCapturePartial(CameraCaptureSession session, CaptureRequest request, CaptureResult result) {
-                super.onCapturePartial(session, request, result);
             }
 
             @Override
