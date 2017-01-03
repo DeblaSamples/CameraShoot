@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -27,6 +30,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewGroup            mSurfaceViewParent = null;
     private ViewGroup            mLayoutPannel      = null;
     private SurfaceView          mSfvCameraPreview  = null;
+    private Switch               mSwtDrawMasker     = null;
     private CameraHelper         mCameraHelper      = null;
 
     @Override
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mSurfaceViewParent = (ViewGroup) findViewById(R.id.content_main);
         mLayoutPannel      = (ViewGroup) findViewById(R.id.content_preview);
         mSfvCameraPreview  = (SurfaceView) findViewById(R.id.SurfaceView_Camera);
+        mSwtDrawMasker     = (Switch) findViewById(R.id.Switch_DrawMasker);
         mFabScreenShoot    = (FloatingActionButton) findViewById(R.id.fab);
     }
 
@@ -85,15 +91,29 @@ public class MainActivity extends AppCompatActivity {
                 mLayoutPannel.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                 mLayoutPannel.setDrawingCacheEnabled(true);
 
-                Bitmap             mask         = mLayoutPannel.getDrawingCache();
-                Bitmap             output       = Bitmap.createBitmap(mask.getWidth(), mask.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas             canvas       = new Canvas(output);
-                Paint              paint        = new Paint(Paint.ANTI_ALIAS_FLAG);
-                PorterDuffXfermode xfermode     = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+                final float[] colorMatrix  = new float[] {
+                        1, 0, 0, 0,   0,
+                        0, 1, 0, 0,   0,
+                        0, 0, 1, 0,   0,
+                        0, 0, 0, 255, 0
+                };
+
+                Bitmap             masker       = mLayoutPannel.getDrawingCache();
+                Bitmap             mask         = Bitmap.createBitmap(masker.getWidth(), masker.getHeight(), Bitmap.Config.ARGB_8888);
+                Bitmap             output       = Bitmap.createBitmap(masker.getWidth(), masker.getHeight(), Bitmap.Config.ARGB_8888);
                 float              bitmapWidth  = bitmap.getWidth();
                 float              bitmapHeight = bitmap.getHeight();
                 float              maskWidth    = mask.getWidth();
                 float              maskHeight   = mask.getHeight();
+                Canvas             canvas       = new Canvas(output);
+                Canvas             maskCanvas   = new Canvas(mask);
+                Paint              paint        = new Paint(Paint.ANTI_ALIAS_FLAG);
+                PorterDuffXfermode xfermode     = new PorterDuffXfermode(PorterDuff.Mode.DST_IN);
+                ColorFilter        colorFilter  = new ColorMatrixColorFilter(colorMatrix);
+
+                paint.setColorFilter(colorFilter);
+                maskCanvas.drawBitmap(masker, 0, 0, paint);
+                paint.setColorFilter(null);
 
                 canvas.save();
                 canvas.scale(maskWidth / bitmapHeight, maskHeight / bitmapWidth);
@@ -105,8 +125,10 @@ public class MainActivity extends AppCompatActivity {
                 paint.setXfermode(xfermode);
                 canvas.drawBitmap(mask, 0, 0, paint);
 
-//                paint.setXfermode(null);
-//                canvas.drawBitmap(mask, 0, 0, paint);
+                if (mSwtDrawMasker.isChecked()) {
+                    paint.setXfermode(null);
+                    canvas.drawBitmap(masker, 0, 0, paint);
+                }
 
                 new ImageWriter().writeToDirectory(
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()

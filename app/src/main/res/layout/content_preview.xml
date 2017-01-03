@@ -15,24 +15,24 @@
 
     <View
         android:id="@+id/View_CenterMarker"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="50dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_margin="25dp"
         android:layout_centerInParent="true"
         android:background="@drawable/bg_marker"/>
 
     <View
         android:id="@+id/View_LeftMarker"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/View_CenterMarker"
         android:background="@drawable/bg_marker"/>
 
     <View
         android:id="@+id/View_RightMarker"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/View_CenterMarker"
         android:background="@drawable/bg_marker"/>

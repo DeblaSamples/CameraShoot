@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
@@ -38,7 +37,15 @@ import java.util.Arrays;
  * Camera helper
  * @Auther Cocoonshu
  * @Date   2017-01-01 10:59:11
+ *
+ * @Notice in android.hardware.camera2.CameraCaptureSession
+ *   **
+ *    * Temporary for migrating to Callback naming
+ *    * @hide
+ *    *
+ *   public static abstract class StateListener extends StateCallback {}
  */
+
 public class CameraHelper {
 
     private static final String   NAME_CAMERA_HELPER_HANDLER       = "CameraHelperHandler";
@@ -210,7 +217,6 @@ public class CameraHelper {
                     startCameraStreamHandler(); // Make sure camera stream handler is alive
 
                     // Capture surface
-                    Rect        surfaceSize    = mPreviewSurfaceHolder.getSurfaceFrame();
                     ImageReader imageReader    = ImageReader.newInstance(mOutputSize.getWidth(), mOutputSize.getHeight(), ImageFormat.JPEG, 1);
                     Surface     captureSurface = imageReader.getSurface();
                     imageReader.setOnImageAvailableListener(mImageReaderListener, mCameraStreamHandler);
